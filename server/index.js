@@ -13,10 +13,17 @@ import helmet from 'helmet';
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://codebridge.ssshogunnn.info';
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+    origin: ALLOWED_ORIGIN,
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
+
 app.use(helmet());
 
 const limiter = rateLimit({
@@ -26,7 +33,14 @@ const limiter = rateLimit({
 app.use(limiter);
 
 const server = http.createServer(app);
-const io = new Server(server);
+
+const io = new Server(server, {
+    cors: {
+        origin: ALLOWED_ORIGIN,
+        methods: ['GET', 'POST'],
+        credentials: true
+    }
+});
 
 const userSocketMap = {};
 
